@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearnHub | Science & Education Dashboard</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f2f2f2;
+            color: #333;
+            line-height: 1.6;
+            transition: all 0.3s ease;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Header */
+        header {
+            background-color: #333;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        header h1 {
+            font-size: 3rem;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+
+        /* Search Section */
+        .search-section {
+            margin: 20px;
+            text-align: center;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        #searchInput {
+            padding: 15px;
+            font-size: 1.2rem;
+            width: 80%;
+            max-width: 800px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: border-color 0.3s ease;
+        }
+
+        #searchInput:focus {
+            border-color: #007BFF;
+        }
+
+        /* Article List */
+        .article-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .article-item {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .article-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .article-item h3 {
+            color: #007BFF;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            flex-grow: 1;
+        }
+
+        .article-item p {
+            color: #555;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .article-item p:after {
+            content: "→";
+            font-weight: bold;
+        }
+
+        /* Article View */
+        .article-view {
+            display: none;
+            padding: 30px;
+            max-width: 1200px;
+            margin: 40px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #articleTitle {
+            font-size: 3rem;
+            color: #007BFF;
+            margin-bottom: 20px;
+        }
+
+        #articleContent {
+            font-size: 1.1rem;
+            color: #555;
+            line-height: 1.7;
+            margin-bottom: 30px;
+            white-space: pre-wrap; /* Ensure text formatting is preserved */
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Footer Removed */
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>LearnHub Dashboard</h1>
+        <p>Explore articles and learn about science, technology, and more!</p>
+    </header>
+
+    <main>
+        <section class="search-section">
+            <input type="text" id="searchInput" placeholder="Search for articles..." onkeyup="searchArticles()">
+        </section>
+
+        <section class="article-list" id="articleList">
+            <!-- Articles will appear here -->
+        </section>
+
+        <section class="article-view" id="articleView">
+            <h2 id="articleTitle"></h2>
+            <p id="articleContent"></p>
+            <button onclick="goBack()">Go Back to Dashboard</button>
+        </section>
+    </main>
+
+    <script>
+        // Sample Data: 150 Articles (example entries)
+        const articles = [
+    {
+        "title": "How Water Falls from 100 Meters",
+        "content": "Water falls with a certain speed due to gravity. When falling from a height of 100 meters, the speed increases until it hits the ground. This is influenced by air resistance. The formula for calculating the speed of a falling object is: speed = sqrt(2 * g * h), where 'g' is the acceleration due to gravity and 'h' is the height from which it falls.",
+        "tags": ["physics", "gravity", "science"]
+    },
+    {
+        "title": "The Theory of Relativity Explained",
+        "content": "Albert Einstein's theory of relativity is a fundamental theory in physics. It describes the relationship between space and time, and how gravity affects them. The theory introduced the concept that time and space are not separate entities but instead are intertwined in what is known as spacetime.",
+        "tags": ["physics", "theory", "relativity"]
+    },
+    {
+        "title": "Understanding Photosynthesis",
+        "content": "Photosynthesis is the process by which plants convert light energy into chemical energy. This is crucial for the survival of life on Earth. Plants absorb sunlight through chlorophyll, which they use to convert carbon dioxide and water into glucose and oxygen.",
+        "tags": ["biology", "plants", "energy"]
+    },
+    {
+        "title": "The Basics of the Solar System",
+        "content": "Our solar system consists of the Sun and eight planets, along with moons and other celestial bodies. Learn about the size and characteristics of each planet. The largest planet, Jupiter, has a mass 318 times that of Earth, while the smallest, Mercury, is only slightly larger than the Moon.",
+        "tags": ["astronomy", "solar system", "planets"]
+    },
+    {
+        "title": "How Do Black Holes Form?",
+        "content": "Black holes form when a massive star collapses under its own gravity. This creates a region in space with an extremely strong gravitational pull that even light cannot escape. The point of no return around a black hole is called the event horizon.",
+        "tags": ["astronomy", "black holes", "space"]
+    },
+    {
+        "title": "What Causes Earthquakes?",
+        "content": "Earthquakes occur when tectonic plates shift and release energy. The location where an earthquake starts underground is called the focus, while the point directly above it on the surface is the epicenter. Seismic waves travel outward from the focus, causing the ground to shake.",
+        "tags": ["geology", "earthquakes", "natural disasters"]
+    },
+    {
+        "title": "How Do Computers Process Information?",
+        "content": "Computers use binary code, consisting of 1s and 0s, to process information. The central processing unit (CPU) acts as the brain of the computer, executing instructions. Data is stored in memory and retrieved when needed for calculations and operations.",
+        "tags": ["technology", "computers", "binary"]
+    },
+    {
+        "title": "The Science Behind Electricity",
+        "content": "Electricity is the movement of electrons through a conductor. It is generated using various methods, including burning fossil fuels, hydroelectric dams, and nuclear power. The flow of electricity is measured in amperes, while voltage represents the electric potential.",
+        "tags": ["physics", "electricity", "energy"]
+    },
+    {
+        "title": "How Do Vaccines Work?",
+        "content": "Vaccines help the immune system recognize and fight diseases by introducing a weakened or inactive form of a virus. This stimulates the production of antibodies, which provide immunity against future infections.",
+        "tags": ["medicine", "vaccines", "health"]
+    },
+    {
+        "title": "Exploring the Deep Ocean",
+        "content": "The deep ocean is one of the least explored regions on Earth. It is home to unique creatures adapted to high pressure and darkness. Submersibles and remotely operated vehicles (ROVs) allow scientists to study this mysterious environment.",
+        "tags": ["oceanography", "deep sea", "marine life"]
+    },
+    {
+        "title": "The Water Cycle",
+        "content": "The water cycle is the continuous movement of water within the Earth system. Water evaporates from the surface, condenses to form clouds, and falls back to Earth as precipitation. This process is crucial for maintaining the balance of freshwater resources.",
+        "tags": ["environment", "water cycle", "science"]
+    },
+    {
+        "title": "The Pythagorean Theorem",
+        "content": "The Pythagorean theorem states that in a right-angled triangle, the square of the hypotenuse is equal to the sum of the squares of the other two sides. This is expressed as: a² + b² = c².",
+        "tags": ["math", "geometry", "theorem"]
+    },
+    {
+        "title": "The Human Digestive System",
+        "content": "The digestive system breaks down food into nutrients, which are absorbed into the bloodstream. Key components include the mouth, esophagus, stomach, and intestines, where enzymes and acids aid in breaking down food.",
+        "tags": ["biology", "digestive system", "health"]
+    },
+    {
+        "title": "The Basics of Algebra",
+        "content": "Algebra involves working with variables and equations. Basic algebra includes solving for an unknown variable, simplifying expressions, and understanding functions. It's a foundational concept in mathematics.",
+        "tags": ["math", "algebra", "education"]
+    },
+    {
+        "title": "Newton's Laws of Motion",
+        "content": "Sir Isaac Newton's three laws of motion describe how objects move in response to forces. The laws are: 1) An object at rest will stay at rest unless acted upon, 2) Force equals mass times acceleration (F=ma), and 3) For every action, there is an equal and opposite reaction.",
+        "tags": ["physics", "motion", "newton"]
+    },
+    {
+        "title": "The Importance of Exercise",
+        "content": "Exercise is essential for maintaining physical and mental health. It strengthens the heart, improves flexibility, and boosts mood by releasing endorphins. Regular exercise can prevent chronic diseases like diabetes and heart disease.",
+        "tags": ["health", "exercise", "well-being"]
+    },
+    {
+        "title": "The Role of DNA in Genetics",
+        "content": "DNA carries the genetic instructions for the development, functioning, and reproduction of all living organisms. It is made up of nucleotides and forms a double helix structure. Genes are specific sequences of DNA that code for proteins.",
+        "tags": ["biology", "genetics", "DNA"]
+    },
+    {
+        "title": "The Concept of Plate Tectonics",
+        "content": "Plate tectonics explains the movement of Earth's lithosphere on the more fluid asthenosphere beneath it. The interactions of tectonic plates cause earthquakes, volcanoes, and the formation of mountain ranges.",
+        "tags": ["geology", "tectonics", "earth science"]
+    },
+    {
+        "title": "Introduction to Economics",
+        "content": "Economics is the study of how people use resources to satisfy their needs and wants. It examines how goods and services are produced, distributed, and consumed. Microeconomics focuses on individual markets, while macroeconomics looks at the economy as a whole.",
+        "tags": ["economics", "business", "finance"]
+    },
+    {
+        "title": "The Structure of an Atom",
+        "content": "An atom is made up of protons, neutrons, and electrons. The protons and neutrons form the nucleus, while electrons orbit the nucleus in energy levels. The number of protons determines the element.",
+        "tags": ["chemistry", "atom", "science"]
+    },
+    {
+        "title": "The Theory of Evolution by Natural Selection",
+        "content": "Charles Darwin's theory of evolution by natural selection states that organisms evolve over time through the differential survival and reproduction of organisms with advantageous traits. This leads to the gradual change of species.",
+        "tags": ["biology", "evolution", "Darwin"]
+    },
+    {
+        "title": "How Computers Work: The Basics of Hardware",
+        "content": "The hardware of a computer includes the physical components like the motherboard, CPU, RAM, and hard drive. The CPU processes data, while the RAM temporarily stores data. Input and output devices allow the user to interact with the computer.",
+        "tags": ["technology", "computers", "hardware"]
+    },
+    {
+        "title": "The History of the Internet",
+        "content": "The internet started as a project called ARPANET in the late 1960s. Over time, it evolved into the global network we know today, connecting billions of devices worldwide. The internet has revolutionized communication, business, and access to information.",
+        "tags": ["technology", "internet", "history"]
+    },
+    {
+        "title": "The Renaissance: A Rebirth of Art and Culture",
+        "content": "The Renaissance, which began in Italy in the 14th century, was a period of great cultural, artistic, and intellectual growth. It saw the rise of artists like Leonardo da Vinci and Michelangelo and the revival of classical Greek and Roman knowledge.",
+        "tags": ["history", "renaissance", "art"]
+    },
+    {
+        "title": "The Function of the Human Heart",
+        "content": "The human heart is a muscular organ responsible for pumping blood throughout the body. It consists of four chambers: two atria and two ventricles. The heart circulates oxygenated blood to the body and deoxygenated blood to the lungs.",
+        "tags": ["biology", "heart", "anatomy"]
+    },
+    {
+        "title": "The Impact of Climate Change",
+        "content": "Climate change refers to long-term changes in temperature, precipitation, and other atmospheric conditions. Human activities, such as burning fossil fuels, have led to the increase of greenhouse gases, contributing to global warming and severe weather patterns.",
+        "tags": ["environment", "climate change", "science"]
+    },
+    {
+        "title": "The Role of the United Nations",
+        "content": "The United Nations (UN) is an international organization founded in 1945 to promote peace, security, and cooperation among countries. It addresses global challenges such as poverty, human rights, and conflict resolution.",
+        "tags": ["politics", "UN", "international relations"]
+    },
+    {
+        "title": "The Basic Principles of Accounting",
+        "content": "Accounting involves recording, classifying, and summarizing financial transactions to provide information for decision-making. Key principles include consistency, prudence, and transparency, ensuring the financial health of businesses.",
+        "tags": ["business", "finance", "accounting"]
+    },
+    {
+        "title": "The Industrial Revolution",
+        "content": "The Industrial Revolution, which began in the late 18th century, marked a shift from agrarian economies to industrialized societies. This era saw advancements in machinery, transportation, and manufacturing, transforming economies and societies worldwide.",
+        "tags": ["history", "industrial revolution", "society"]
+    },
+    {
+        "title": "The Process of Cellular Respiration",
+        "content": "Cellular respiration is the process by which cells convert glucose and oxygen into energy (ATP), carbon dioxide, and water. This process occurs in the mitochondria of eukaryotic cells and is essential for producing energy for cellular activities.",
+        "tags": ["biology", "cellular respiration", "energy"]
+    },
+    {
+        "title": "Supply and Demand in Economics",
+        "content": "The law of supply and demand is a fundamental economic concept that describes the relationship between the availability of a good or service (supply) and the desire for it (demand). Prices tend to rise when demand exceeds supply, and fall when supply exceeds demand.",
+        "tags": ["economics", "supply and demand", "market forces"]
+    },
+    {
+        "title": "Behavioral Psychology: Understanding Human Actions",
+        "content": "Behavioral psychology studies how external stimuli influence human behavior. It focuses on observable behaviors rather than internal thoughts. This field explores learning through reinforcement, punishment, and conditioning.",
+        "tags": ["psychology", "behaviorism", "learning"]
+    },
+    {
+        "title": "The Earth's Layers: A Geographical Overview",
+        "content": "The Earth is composed of four main layers: the crust, mantle, outer core, and inner core. These layers vary in composition and temperature. The crust is where we live, while the mantle is composed of semi-solid rock that moves due to convection currents.",
+        "tags": ["geography", "earth science", "layers"]
+    },
+    {
+        "title": "The Industrial Revolution's Impact on Society",
+        "content": "The Industrial Revolution brought about significant changes in manufacturing, technology, and society. It led to urbanization, the rise of factories, and increased productivity, but also introduced social issues like poor working conditions and child labor.",
+        "tags": ["history", "industrial revolution", "society"]
+    },
+    {
+        "title": "Fiscal and Monetary Policy in Economics",
+        "content": "Fiscal policy refers to government spending and taxation, while monetary policy involves the control of the money supply and interest rates. Both are tools used by governments to influence the economy's growth, inflation, and employment.",
+        "tags": ["economics", "fiscal policy", "monetary policy"]
+    },
+    {
+        "title": "Cognitive Dissonance in Psychology",
+        "content": "Cognitive dissonance is a psychological theory developed by Leon Festinger, explaining the discomfort felt when holding two conflicting beliefs or when behavior contradicts beliefs. This motivates individuals to resolve the inconsistency by changing their attitudes or behaviors.",
+        "tags": ["psychology", "cognitive dissonance", "behavioral change"]
+    },
+    {
+        "title": "Climate Zones Around the World",
+        "content": "The Earth is divided into different climate zones based on latitude, altitude, and geographical factors. These zones include tropical, temperate, and polar climates. Each zone has its own distinct weather patterns and ecosystems.",
+        "tags": ["geography", "climate", "weather"]
+    },
+    {
+        "title": "The Roman Empire: Rise and Fall",
+        "content": "The Roman Empire was one of the most powerful civilizations in history, dominating the Mediterranean and much of Europe for over 500 years. Its decline was due to internal strife, economic troubles, and invasions by barbarian tribes.",
+        "tags": ["history", "roman empire", "ancient civilizations"]
+    },
+    {
+        "title": "Opportunity Cost in Economics",
+        "content": "Opportunity cost is the value of the next best alternative foregone when making a decision. It's a key concept in economics, as it emphasizes that every choice has trade-offs and helps individuals and businesses make more informed decisions.",
+        "tags": ["economics", "opportunity cost", "decision-making"]
+    },
+    {
+        "title": "Freud's Theory of the Unconscious Mind",
+        "content": "Sigmund Freud proposed that the unconscious mind holds desires, memories, and experiences that influence behavior. His theory also introduced the concept of defense mechanisms, which help people cope with internal conflict and anxiety.",
+        "tags": ["psychology", "Freud", "unconscious mind"]
+    },
+    {
+        "title": "The Earth's Water Distribution",
+        "content": "The Earth's water is distributed in oceans, rivers, lakes, glaciers, and underground reservoirs. Oceans hold about 97% of Earth's water, while only about 3% is freshwater, most of which is locked in ice caps and glaciers.",
+        "tags": ["geography", "water distribution", "earth"]
+    },
+    {
+        "title": "The French Revolution: A Turning Point in History",
+        "content": "The French Revolution (1789-1799) was a pivotal event in world history, marked by the overthrow of the French monarchy and the rise of radical political change. It brought about the end of feudalism and led to the establishment of the French Republic.",
+        "tags": ["history", "french revolution", "revolution"]
+    },
+    {
+        "title": "The Law of Comparative Advantage",
+        "content": "The law of comparative advantage states that countries or individuals should specialize in producing goods where they have a lower opportunity cost than others. This promotes trade and leads to more efficient global resource use.",
+        "tags": ["economics", "comparative advantage", "trade"]
+    },
+    {
+        "title": "Operant Conditioning: Reinforcement and Punishment",
+        "content": "Operant conditioning, developed by B.F. Skinner, focuses on how behavior can be shaped by consequences. Positive reinforcement encourages behavior, while punishment discourages it. This theory is widely used in education and behavior modification.",
+        "tags": ["psychology", "operant conditioning", "reinforcement"]
+    },
+    {
+        "title": "The World's Largest Deserts",
+        "content": "Deserts are arid regions with very little precipitation. The largest deserts in the world include the Sahara in Africa, the Arabian Desert in the Middle East, and Antarctica, which is technically the largest desert due to its low precipitation levels.",
+        "tags": ["geography", "deserts", "climate"]
+    },
+    {
+        "title": "The Fall of the Berlin Wall",
+        "content": "The Berlin Wall, which divided East and West Germany during the Cold War, fell on November 9, 1989. This event symbolized the end of Communist rule in Eastern Europe and paved the way for the reunification of Germany.",
+        "tags": ["history", "Berlin Wall", "cold war"]
+    },
+    {
+        "title": "Elasticity of Demand in Economics",
+        "content": "Elasticity of demand measures how the quantity demanded of a good responds to changes in price. If demand changes significantly with price, it is considered elastic. If demand remains relatively stable despite price changes, it is inelastic.",
+        "tags": ["economics", "elasticity", "demand"]
+    },
+    {
+        "title": "The Role of Memory in Psychology",
+        "content": "Memory is the process by which we encode, store, and retrieve information. It is essential for learning and adapting. There are different types of memory, including sensory, short-term, and long-term memory, each with its own function.",
+        "tags": ["psychology", "memory", "cognition"]
+    },
+    {
+        "title": "The Major Mountain Ranges of the World",
+        "content": "The Earth features several major mountain ranges, including the Himalayas, Andes, and Rockies. These mountains were formed by tectonic plate movements and play a significant role in climate, ecosystems, and human settlement patterns.",
+        "tags": ["geography", "mountains", "earth science"]
+    },
+    {
+        "title": "The Age of Exploration: Columbus and Beyond",
+        "content": "The Age of Exploration was a period during the 15th and 16th centuries when European explorers set out to discover new lands. Christopher Columbus's voyages to the Americas marked the beginning of European expansion and the Columbian Exchange.",
+        "tags": ["history", "exploration", "Columbus"]
+    },
+    {
+        "title": "Monetary Systems and Currency",
+        "content": "A monetary system is the set of institutions, rules, and mechanisms used to create, distribute, and regulate currency. Modern monetary systems rely on central banks to manage money supply and interest rates, while currencies are used as a medium of exchange.",
+        "tags": ["economics", "currency", "monetary system"]
+    },
+    {
+        "title": "The Impact of World War II on Global Politics",
+        "content": "World War II drastically reshaped global politics. It led to the formation of the United Nations, the rise of the U.S. and Soviet Union as superpowers, and the beginning of the Cold War. The war's outcomes also set the stage for decolonization movements worldwide.",
+        "tags": ["WW2", "politics", "global conflict"]
+    },
+    {
+        "title": "Introduction to Constitutional Law",
+        "content": "Constitutional law deals with the interpretation and implementation of a country's constitution. It defines the structure of government, individual rights, and the relationship between the state and its citizens. Understanding this law is crucial for safeguarding democracy.",
+        "tags": ["law", "constitutional law", "government"]
+    },
+    {
+        "title": "Theories of Political Power",
+        "content": "Political power can be understood through various lenses such as democracy, authoritarianism, and socialism. These theories examine how power is distributed in societies and the impact of governmental structures on individual freedoms and social equality.",
+        "tags": ["politics", "political theory", "power"]
+    },
+    {
+        "title": "Basic Algebra for Mathematics Students",
+        "content": "Algebra is a branch of mathematics dealing with symbols and the rules for manipulating those symbols. The basic principles involve solving for variables and using equations to express relationships between different quantities.",
+        "tags": ["mathematics", "algebra", "equations"]
+    },
+    {
+        "title": "Introduction to Civil Engineering",
+        "content": "Civil engineering focuses on designing and building infrastructure such as roads, bridges, and buildings. It involves understanding materials, structures, and the environmental impact of construction projects, aiming to improve public infrastructure and safety.",
+        "tags": ["engineering", "civil engineering", "construction"]
+    },
+    {
+        "title": "What is Digital Marketing?",
+        "content": "Digital marketing involves promoting products or services through digital channels, including social media, search engines, and email. It focuses on reaching a targeted audience using various online platforms to increase brand awareness and sales.",
+        "tags": ["digital marketing", "marketing", "online advertising"]
+    },
+    {
+        "title": "Entrepreneurship 101: Starting Your Own Business",
+        "content": "Entrepreneurship is the process of designing, launching, and running a new business. It requires creativity, risk-taking, and management skills. Entrepreneurs identify market needs and create solutions, often through innovative products or services.",
+        "tags": ["business", "entrepreneurship", "startup"]
+    },
+    {
+        "title": "Mastering Photography: Tips and Techniques",
+        "content": "Photography is an art form that involves capturing light to create images. Understanding camera settings, composition, lighting, and editing techniques can help you take professional-quality photos. Whether you're shooting portraits or landscapes, practice is key.",
+        "tags": ["photography", "art", "photography techniques"]
+    },
+    {
+        "title": "Introduction to Acrylic Painting",
+        "content": "Acrylic painting is a popular medium known for its fast-drying time and versatility. Artists use acrylic paints to create vibrant and durable works of art. Learn basic techniques like layering, blending, and color mixing to enhance your painting skills.",
+        "tags": ["painting", "art", "acrylic painting"]
+    },
+    {
+        "title": "Basic Crafting: DIY Projects for Beginners",
+        "content": "Crafting involves creating decorative or functional items by hand. Basic crafting techniques can include knitting, sewing, woodwork, and pottery. These projects are a great way to express creativity and even create personalized gifts for loved ones.",
+        "tags": ["crafts", "DIY", "crafting"]
+    },
+    {
+        "title": "Learning French for Beginners",
+        "content": "French is a beautiful Romance language spoken by millions of people around the world. Start learning French by mastering basic phrases, vocabulary, and grammar. With practice, you can hold simple conversations and understand French culture.",
+        "tags": ["language", "French", "language learning"]
+    },
+    {
+        "title": "Learning Spanish: A Beginner's Guide",
+        "content": "Spanish is one of the most widely spoken languages in the world. Begin your Spanish learning journey by practicing essential vocabulary, pronunciation, and grammar rules. Understanding cultural nuances will also help you communicate effectively in Spanish-speaking regions.",
+        "tags": ["language", "Spanish", "language learning"]
+    },
+    {
+        "title": "The Evolution of Education Systems",
+        "content": "The education system has evolved over centuries, shifting from informal family-based learning to modern public schooling. Various educational philosophies and reforms have shaped teaching methods, aiming to better prepare students for the workforce and societal roles.",
+        "tags": ["education", "school systems", "learning"]
+    },
+    {
+        "title": "Intro to Programming: Learning to Code",
+        "content": "Learning to code opens doors to a wide range of career opportunities in tech. Start with basic programming languages like Python or JavaScript. Understand core concepts such as variables, loops, and conditionals to build simple programs.",
+        "tags": ["coding", "programming", "IT"]
+    },
+    {
+        "title": "Understanding Web Development",
+        "content": "Web development involves creating websites and web applications. Learn about frontend technologies like HTML, CSS, and JavaScript, as well as backend frameworks and databases. Building interactive and responsive websites is a key skill in the modern digital world.",
+        "tags": ["coding", "web development", "technology"]
+    },
+    {
+        "title": "Creative Writing: Crafting Compelling Narratives",
+        "content": "Creative writing is the art of crafting fictional stories. Learn how to develop characters, build settings, and create engaging plots. Practice different genres like fiction, poetry, and scriptwriting to discover your unique writing style.",
+        "tags": ["writing", "creative writing", "storytelling"]
+    },
+    {
+        "title": "The History of World War II: A Global Conflict",
+        "content": "World War II was one of the deadliest and most impactful conflicts in history, involving countries around the world. It reshaped political borders, economies, and societies, and led to the creation of international organizations like the United Nations.",
+        "tags": ["WW2", "history", "world war"]
+    },
+    {
+        "title": "Contract Law: A Fundamental Aspect of Legal Studies",
+        "content": "Contract law governs the rights and duties of parties involved in agreements. It ensures that promises made in contracts are enforceable by law. Understanding contract law is essential for anyone engaged in business or legal professions.",
+        "tags": ["law", "contract law", "legal studies"]
+    },
+    {
+        "title": "Electromagnetism: A Key Concept in Physics",
+        "content": "Electromagnetism is the branch of physics concerned with the study of electric and magnetic fields and their interactions. This concept is crucial for technologies like electric motors, wireless communication, and power generation.",
+        "tags": ["physics", "electromagnetism", "science"]
+    },
+    {
+        "title": "The Role of Media in Politics",
+        "content": "Media plays a crucial role in shaping public opinion and influencing political decisions. News outlets, social media, and advertising campaigns impact how citizens perceive political issues, candidates, and policies.",
+        "tags": ["politics", "media", "public opinion"]
+    },
+    {
+        "title": "Mathematical Modeling: Solving Real-World Problems",
+        "content": "Mathematical modeling involves using mathematical equations and formulas to represent real-world phenomena. It is used in various fields like engineering, economics, and biology to predict outcomes and optimize solutions.",
+        "tags": ["mathematics", "modeling", "real-world applications"]
+    },
+    {
+        "title": "Environmental Engineering: Sustainable Solutions",
+        "content": "Environmental engineering focuses on creating sustainable solutions to environmental problems such as pollution, waste management, and climate change. It combines principles from engineering, biology, and chemistry to protect the environment.",
+        "tags": ["engineering", "environmental engineering", "sustainability"]
+    }
+        ];
+
+
+        // Function to display articles
+        function displayArticles(filteredArticles) {
+            const articleList = document.getElementById('articleList');
+            articleList.innerHTML = '';  // Clear existing articles
+
+            filteredArticles.forEach(article => {
+                const articleElement = document.createElement('div');
+                articleElement.classList.add('article-item');
+                articleElement.innerHTML = `<h3>${article.title}</h3><p>Click to read more</p>`;
+                articleElement.onclick = () => viewArticle(article);
+                articleList.appendChild(articleElement);
+            });
+        }
+
+        // Function to search articles
+        function searchArticles() {
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            const filteredArticles = articles.filter(article => 
+                article.title.toLowerCase().includes(searchQuery) || 
+                article.content.toLowerCase().includes(searchQuery) || 
+                article.tags.some(tag => tag.toLowerCase().includes(searchQuery))
+            );
+            displayArticles(filteredArticles);
+        }
+
+        // Function to view an article
+        function viewArticle(article) {
+            const articleView = document.getElementById('articleView');
+            document.getElementById('articleTitle').innerText = article.title;
+            document.getElementById('articleContent').innerText = article.content;
+            articleView.style.display = 'block';
+            document.getElementById('articleList').style.display = 'none';
+        }
+
+        // Function to go back to the dashboard
+        function goBack() {
+            document.getElementById('articleView').style.display = 'none';
+            document.getElementById('articleList').style.display = 'grid';
+        }
+
+        // Initial Display of All Articles
+        displayArticles(articles);
+    </script>
+
+</body>
+</html>
